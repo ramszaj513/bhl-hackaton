@@ -21,7 +21,7 @@ import { initAuth } from "../src/index";
 export const auth = initAuth({
   baseUrl: "http://localhost:3000",
   productionUrl: "http://localhost:3000",
-  secret: "secret",
-  discordClientId: "1234567890",
-  discordClientSecret: "1234567890",
+  secret: process.env.AUTH_SECRET as string,
+  discordClientId: process.env.AUTH_DISCORD_ID as string,
+  discordClientSecret: process.env.AUTH_DISCORD_SECRET as string,
 });
