@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1763934588308,
+      "tag": "0000_hot_falcon",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1763936747182,
+      "tag": "0001_equal_agent_brand",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1763937308140,
+      "tag": "0002_eager_edwin_jarvis",
+      "breakpoints": true
+    }
+  ]
+}
