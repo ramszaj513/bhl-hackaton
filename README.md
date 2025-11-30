@@ -1,1 +1,1 @@
-# MathDB
+# Wywóz śmieci

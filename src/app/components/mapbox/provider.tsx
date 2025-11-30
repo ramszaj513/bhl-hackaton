@@ -55,7 +55,7 @@ export default function MapProvider({
     return (
         <div className="z-[1000]">
             <MapContext.Provider value={{ map: map.current! }}>
-                {children}
+                {loaded && children}
             </MapContext.Provider>
             {!loaded && (
                 <div className="absolute inset-0 flex items-center justify-center bg-background/80 z-[1000]">
