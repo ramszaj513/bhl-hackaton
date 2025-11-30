@@ -7,7 +7,7 @@ import { getCategoryPrediction } from "./recognition";
 export async function getWastejobs() {
   try {
     const wastejobs = await db.query.wastejob.findMany({
-      // where: eq(wastejob.status, "active"),
+      where: eq(wastejob.status, "active"),
     });
     return wastejobs;
   } catch (error) {
