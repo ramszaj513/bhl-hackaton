@@ -4,7 +4,14 @@ import { useEffect, useState } from "react";
 import { WasteJob, WasteJobCard } from "./waste-job-card";
 import { Loader2 } from "lucide-react";
 
-export function WasteJobList() {
+export function WasteJobList({
+  onShowRoute,
+}: {
+  onShowRoute?: (
+    location: { latitude: number; longitude: number },
+    category: string
+  ) => void;
+}) {
   const [wasteJobs, setWasteJobs] = useState<WasteJob[]>([]);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -85,7 +92,13 @@ export function WasteJobList() {
   return (
     <div className="w-120 h-full space-y-4">
       {wasteJobs.map((job) => (
-        <WasteJobCard key={job.id} wasteJob={job} variant={job.status} onClaimJob={handleJobClaim} />
+        <WasteJobCard
+          key={job.id}
+          wasteJob={job}
+          variant={job.status}
+          onClaimJob={handleJobClaim}
+          onShowRoute={onShowRoute}
+        />
       ))}
     </div>
   );

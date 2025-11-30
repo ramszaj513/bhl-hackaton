@@ -32,6 +32,7 @@ export default function Marker({
             ...props,
         };
 
+        console.log(map);
         marker = new mapboxgl.Marker(options)
             .setLngLat([longitude, latitude])
             .addTo(map);

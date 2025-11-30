@@ -54,6 +54,10 @@ interface WasteJobCardProps extends VariantProps<typeof badgeVariants> {
   wasteJob: WasteJob;
   onClaimJob: (jobId: number) => void; // Dodana prop do obsługi akcji
   isButtonDisabled?: boolean; // Prop do ewentualnego wyłączania przycisku
+  onShowRoute?: (
+    location: { latitude: number; longitude: number },
+    category: string
+  ) => void;
 }
 
 // Mapowanie statusów na POLSKI tekst
@@ -81,7 +85,12 @@ const categoryTranslations: Record<
   },
 };
 
-export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJobCardProps) {
+export function WasteJobCard({
+  wasteJob,
+  onClaimJob,
+  isButtonDisabled,
+  onShowRoute,
+}: WasteJobCardProps) {
   const {
     id,
     title,
@@ -173,7 +182,27 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
             </div>
           </CardContent>
 
-
+          <CardFooter className="p-4 pt-0 flex justify-end gap-2">
+            {onShowRoute && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() =>
+                  onShowRoute(
+                    {
+                      latitude: parseFloat(wasteJob.pickupLatitude),
+                      longitude: parseFloat(wasteJob.pickupLongitude),
+                    },
+                    wasteJob.category
+                  )
+                }
+              >
+                <MapPin className="h-4 w-4 mr-2" />
+                Pokaż trasę
+              </Button>
+            )}
+            {/* Tutaj można dodać inne przyciski, np. "Odbierz" */}
+          </CardFooter>
 
         </div>
       </div>
