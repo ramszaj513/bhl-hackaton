@@ -1,6 +1,6 @@
 import { auth } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
-import { activateWasteJob } from "@/src/lib/waste-jobs";
+import { completeWasteJob } from "@/src/lib/waste-jobs";
 
 export async function PUT(request: Request) {
   try {
