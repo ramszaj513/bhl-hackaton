@@ -58,25 +58,25 @@ export function WasteJobForm() {
   {
     id: "pszok",
     name: "PSZOK",
-    description: "Odpady wielkogabarytowe, budowlane lub inne problematyczne",
+    description: "",
     iconKey: "pszok",
   },
   {
     id: "small_electronics",
     name: "Mała Elektronika",
-    description: "Np. telefony, ładowarki, małe AGD.",
+    description: "",
     iconKey: "small_electronics",
   },
   {
     id: "electronics",
     name: "Duża Elektronika",
-    description: "Np. telewizory, monitory, pralki, lodówki.",
+    description: "",
     iconKey: "electronics",
   },
   {
     id: "expired_medications",
     name: "Lekarstwa i Odpady Medyczne",
-    description: "Przeterminowane leki i inne odpady farmaceutyczne.",
+    description: "",
     iconKey: "expired_medications",
   },
 ];
@@ -141,7 +141,7 @@ export function WasteJobForm() {
   return (
     <Card className="max-w-2xl mx-auto">
       <CardHeader>
-        <CardTitle>Create a New Waste Job</CardTitle>
+        <CardTitle>Znajdź gdzie wyrzucić śmieci</CardTitle>
         <CardDescription>
           Fill out the details below to post a new job.
         </CardDescription>
@@ -149,7 +149,7 @@ export function WasteJobForm() {
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-6">
           <div className="space-y-2">
-            <Label>Attach a Picture</Label>
+            <Label>Załącz zdjęcie</Label>
             <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md">
               <div className="space-y-1 text-center">
                 {preview ? (
@@ -258,9 +258,9 @@ export function WasteJobForm() {
           {error && <p className="text-sm text-destructive">{error}</p>}
           {success && <p className="text-sm text-green-600">{success}</p>}
         </CardContent>
-        <CardFooter>
+        <CardFooter className="mt-6">
           <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading ? "Submitting..." : "Create Waste Job"}
+            {isLoading ? "Submitting..." : "Znajdź gdzie wyrzucić przedmiot"}
           </Button>
         </CardFooter>
       </form>
