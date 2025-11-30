@@ -42,9 +42,10 @@ export default function ZleceniaContent({
                 >
                     {/* Używamy full height/width wewnątrz kontenera w-3/4 */}
                     <MapComponent
-                        deliveryPoints={[]}
+                        deliveryPoints={deliveryPoints}
                         pickupPoints={pickupPoints}
                         startingPoint={routeRequest?.startingPoint}
+                        showDeliveryPoints={false}
                         targetCategory={routeRequest?.targetCategory}
                     />
                 </Suspense>

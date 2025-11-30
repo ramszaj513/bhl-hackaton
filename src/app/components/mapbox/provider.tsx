@@ -56,6 +56,7 @@ export default function MapProvider({
             if (map.current) {
                 map.current.remove();
                 map.current = null;
+                setLoaded(false);
             }
         };
     }, [initialViewState, mapContainerRef]);

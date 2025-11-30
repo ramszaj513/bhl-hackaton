@@ -1,6 +1,7 @@
 "use client";
 
-import { useRef, useState, useEffect } from 'react';
+import { useRef, useState, useEffect, useMemo } from 'react';
+import { useSearchParams } from 'next/navigation';
 import MapProvider from './mapbox/provider';
 
 import { WasteDeliveryPointType, WasteJobType } from '@/src/db/schema';
@@ -17,22 +18,34 @@ const MOCK_START_POINT = {
 };
 
 
-export default function MapComponent({ deliveryPoints, pickupPoints, startingPoint = MOCK_START_POINT, targetCategory }: {
+export default function MapComponent({ deliveryPoints, pickupPoints, startingPoint = MOCK_START_POINT, targetCategory, showDeliveryPoints = true }: {
     deliveryPoints: WasteDeliveryPointType[];
     pickupPoints: WasteJobType[];
     targetCategory?: WasteDeliveryPointType['category'];
     startingPoint?: { longitude: number; latitude: number };
+    showDeliveryPoints?: boolean;
 }) {
     const mapContainerRef = useRef<HTMLDivElement>(null);
     const [routeGeoJSON, setRouteGeoJSON] = useState<Feature<LineString> | null>(null);
+    const searchParams = useSearchParams();
+
+    const urlCategory = searchParams.get('category') as WasteDeliveryPointType['category'] | null;
+    const activeCategory = targetCategory || urlCategory;
+
+    // Filter points if a category is selected
+    const visibleDeliveryPoints = useMemo(() => {
+        if (!activeCategory) return deliveryPoints;
+        return deliveryPoints.filter(p => p.category === activeCategory);
+    }, [deliveryPoints, activeCategory]);
 
     useEffect(() => {
-        if (!targetCategory) {
+        console.log(startingPoint, activeCategory)
+        if (!activeCategory) {
             setRouteGeoJSON(null);
             return;
         }
 
-        const categoryPoints = deliveryPoints.filter(p => p.category === targetCategory);
+        const categoryPoints = deliveryPoints.filter(p => p.category === activeCategory);
         if (categoryPoints.length === 0) {
             setRouteGeoJSON(null);
             return;
@@ -57,7 +70,7 @@ export default function MapComponent({ deliveryPoints, pickupPoints, startingPoi
         const fetchRoute = async () => {
             try {
                 const query = await fetch(
-                    `https://api.mapbox.com/directions/v5/mapbox/driving/${MOCK_START_POINT.longitude},${MOCK_START_POINT.latitude};${nearestPoint.lon},${nearestPoint.lat}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`,
+                    `https://api.mapbox.com/directions/v5/mapbox/driving/${startingPoint.longitude},${startingPoint.latitude};${nearestPoint.lon},${nearestPoint.lat}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`,
                     { method: 'GET' }
                 );
                 const json = await query.json();
@@ -78,20 +91,24 @@ export default function MapComponent({ deliveryPoints, pickupPoints, startingPoi
 
         fetchRoute();
 
-    }, [targetCategory, deliveryPoints]);
+    }, [startingPoint, activeCategory, deliveryPoints]);
+
+    console.log(routeGeoJSON);
+
+    const initialViewState = useMemo(() => ({
+        longitude: MOCK_START_POINT.longitude,
+        latitude: MOCK_START_POINT.latitude,
+        zoom: 13
+    }), []);
 
     return (
         <div className="w-full h-full min-h-[500px] rounded-lg overflow-hidden relative">
             <div ref={mapContainerRef} className="absolute inset-0 w-full h-full" />
             <MapProvider
                 mapContainerRef={mapContainerRef}
-                initialViewState={{
-                    longitude: startingPoint.longitude,
-                    latitude: startingPoint.latitude,
-                    zoom: 13
-                }}
+                initialViewState={initialViewState}
             >
-                {deliveryPoints.map(point => (
+                {showDeliveryPoints && visibleDeliveryPoints.map(point => (
                     <WastePointMarker key={point.id} point={point} />
                 ))}
                 {pickupPoints.map(point => (
