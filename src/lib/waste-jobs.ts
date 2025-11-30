@@ -65,3 +65,37 @@ export async function createWastejob(id: string, data: CreateWastejobDto) {
     throw new Error("Failed to create wastejob");
   }
 }
+
+
+type wasteJobStatus = 
+  "draft" |
+  "active" |
+  "claimed" |
+  "completed";
+
+
+export async function activateWasteJob(wasteJobId: string) {
+  try {
+    const [result] = await db.update(wastejob)
+      .set({ status: "active" })
+      .where(eq(wastejob.id, parseInt(wasteJobId)))
+      .returning();
+    return result;
+  } catch (error) {
+    console.error("Error updating wastejob status:", error);
+    throw new Error("Failed to update wastejob status");
+  }
+}
+
+export async function assignWasteJob(wasteJobId: string, claimedById: string) {
+  try {
+    const [result] = await db.update(wastejob)
+      .set({ status: "claimed", claimedById: claimedById })
+      .where(eq(wastejob.id, parseInt(wasteJobId)))
+      .returning();
+    return result;
+  } catch (error) {
+    console.error("Error updating wastejob status:", error);
+    throw new Error("Failed to update wastejob status");
+  }
+}
