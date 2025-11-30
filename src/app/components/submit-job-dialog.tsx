@@ -12,36 +12,85 @@ import {
 import { Button } from "@/src/app/components/ui/button";
 import { LocationPicker } from "@/src/app/components/location-picker";
 
-export function SubmitJobDialog() {
-    const [open, setOpen] = useState(true);
+export function SubmitJobDialog({ wasteJobId }: { wasteJobId: number }) {
+    const [open, setOpen] = useState(false);
     const [selectedLocation, setSelectedLocation] = useState<any>(null);
+    const [isLoading, setIsLoading] = useState(false);
 
     const handleLocationSelect = (value: any) => {
         console.log("Selected location:", value);
         setSelectedLocation(value);
-        // You might want to do something more with the location here,
-        // like passing it to a parent component or storing it in a form state.
+    };
+
+    const handleConfirm = async () => {
+        if (!selectedLocation || !wasteJobId) return;
+
+        // Geoapify returns GeoJSON Feature. Coordinates are in geometry.coordinates [lon, lat]
+        // Or sometimes properties.lat/lon depending on configuration, but geometry is standard.
+        // Let's try to safely extract.
+        let lat: number | undefined;
+        let lon: number | undefined;
+
+        if (selectedLocation.properties && selectedLocation.properties.lat && selectedLocation.properties.lon) {
+            lat = selectedLocation.properties.lat;
+            lon = selectedLocation.properties.lon;
+        } else if (selectedLocation.geometry && selectedLocation.geometry.coordinates) {
+            lon = selectedLocation.geometry.coordinates[0];
+            lat = selectedLocation.geometry.coordinates[1];
+        }
+
+        if (lat === undefined || lon === undefined) {
+            console.error("Could not extract coordinates from selection");
+            return;
+        }
+
+        setIsLoading(true);
+        try {
+            const response = await fetch("/api/wastejobs/activate", {
+                method: "PUT",
+                headers: {
+                    "Content-Type": "application/json",
+                },
+                body: JSON.stringify({
+                    wastejobId: wasteJobId.toString(), // API expects string
+                    lat,
+                    lon,
+                }),
+            });
+
+            if (!response.ok) {
+                throw new Error("Failed to activate job");
+            }
+
+            setOpen(false);
+            // Optionally refresh data or notify user
+        } catch (error) {
+            console.error("Error activating job:", error);
+        } finally {
+            setIsLoading(false);
+        }
     };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
             <DialogTrigger asChild>
-                <Button variant="outline">Submit Job</Button>
+                <Button variant="outline">Zleć</Button>
             </DialogTrigger>
             <DialogContent className="sm:max-w-[425px]">
                 <DialogHeader>
-                    <DialogTitle>Submit Waste Job</DialogTitle>
+                    <DialogTitle>Zleć</DialogTitle>
                     <DialogDescription>
-                        Select the location for pickup.
+                        Wybierz lokalizację odbioru.
                     </DialogDescription>
                 </DialogHeader>
                 <div className="grid gap-4 py-4">
                     <LocationPicker onLocationSelect={handleLocationSelect} />
-                    {selectedLocation && (
-                        <div className="text-sm text-muted-foreground">
-                            Selected: {selectedLocation.properties?.formatted || "Unknown location"}
-                        </div>
-                    )}
+                    <Button
+                        onClick={handleConfirm}
+                        disabled={!selectedLocation || !wasteJobId || isLoading}
+                    >
+                        {isLoading ? "Aktywowanie..." : "Potwierdź Lokację"}
+                    </Button>
                 </div>
             </DialogContent>
         </Dialog>

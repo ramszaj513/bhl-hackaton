@@ -2,7 +2,7 @@
 import { getWasteDeliveryPoints } from "@/src/lib/waste-delivery-points";
 import MapComponent from "@/src/app/components/map";
 import { auth } from "@clerk/nextjs/server";
-import { SubmitJobDialog } from "../components/submit-job-dialog";
+
 
 export default async function MapPage() {
     await auth.protect();
@@ -14,7 +14,7 @@ export default async function MapPage() {
             <h1 className="text-2xl font-bold mb-4">Waste Delivery Points</h1>
             <div className="w-full h-[calc(100vh-200px)]">
                 <MapComponent deliveryPoints={points} pickupPoints={[]} targetCategory="small_electronics" />
-                <SubmitJobDialog />
+
             </div>
         </div>
     );

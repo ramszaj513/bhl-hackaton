@@ -5,26 +5,26 @@ import { activateWasteJob } from "@/src/lib/waste-jobs";
 export async function PUT(request: Request) {
   try {
     await auth.protect();
-    
+
     const body = await request.json();
-    const { wastejobId } = body;
-    
-    if (!wastejobId) {
+    const { wastejobId, lat, lon } = body;
+
+    if (!wastejobId || lat === undefined || lon === undefined) {
       return NextResponse.json(
-        { error: "Missing required field: wastejobId" },
+        { error: "Missing required fields: wastejobId, lat, or lon" },
         { status: 400 }
       );
     }
-    
-    const updatedWastejob = await activateWasteJob(wastejobId);
-    
+
+    const updatedWastejob = await activateWasteJob(wastejobId, lat, lon);
+
     if (!updatedWastejob) {
       return NextResponse.json(
         { error: "Wastejob not found" },
         { status: 404 }
       );
     }
-    
+
     return NextResponse.json(updatedWastejob);
   } catch (error) {
     console.error("Error in PUT /api/wastejobs/activate:", error);

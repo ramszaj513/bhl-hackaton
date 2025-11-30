@@ -32,21 +32,21 @@ export async function createWastejob(id: string, data: CreateWastejobDto) {
 
   let category = data.category;
 
-  const { predictedCategory, title } =  await getCategoryPrediction(data.imageData, data.description)
+  const { predictedCategory, title } = await getCategoryPrediction(data.imageData, data.description)
 
-  if(category && predictedCategory != category){
+  if (category && predictedCategory != category) {
     console.error("Error: the predicted category doesnt match the chosen one");
     throw new Error("Failed to create wastejob");
   }
 
-  if(!category){
+  if (!category) {
     category = predictedCategory;
   }
 
-  if(!category){
+  if (!category) {
     console.error("Error");
     throw new Error("Failed to create wastejob");
-  }  
+  }
 
   try {
     const [result] = await db.insert(wastejob).values({
@@ -67,17 +67,24 @@ export async function createWastejob(id: string, data: CreateWastejobDto) {
 }
 
 
-type wasteJobStatus = 
+type wasteJobStatus =
   "draft" |
   "active" |
   "claimed" |
   "completed";
 
 
-export async function activateWasteJob(wasteJobId: string) {
+export async function activateWasteJob(wasteJobId: string, lat: number, lon: number) {
+  console.log("Activating wastejob:", wasteJobId);
+  console.log("Lat:", lat);
+  console.log("Lon:", lon);
   try {
     const [result] = await db.update(wastejob)
-      .set({ status: "active" })
+      .set({
+        status: "active",
+        pickupLatitude: lat.toString(),
+        pickupLongitude: lon.toString()
+      })
       .where(eq(wastejob.id, parseInt(wasteJobId)))
       .returning();
     return result;

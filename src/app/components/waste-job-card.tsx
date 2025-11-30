@@ -13,6 +13,7 @@ import { wasteCategory, wasteJobStatus } from "@/src/db/schema";
 import { VariantProps, cva } from "class-variance-authority";
 import { cn, getBase64Image } from "@/src/lib/utils";
 import CategoryIcon from "./category-icon";
+import { SubmitJobDialog } from "./submit-job-dialog";
 
 export type WasteJob = {
   id: number;
@@ -104,14 +105,15 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
   });
 
   const isClaimable = status === "active";
-  
+  const isActivatable = status === "draft";
+
   // ----------------------------------------------------
   // 2. Ulepszony wygląd komponentu
   // ----------------------------------------------------
 
   return (
     <Card className="w-full max-w-2xl mx-auto border-2 border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden">
-      
+
       {/* Badge Statusu - na górze po prawej */}
       <Badge className={cn(badgeVariants({ variant: status }), "z-10")}>
         {status === "claimed" ? <Clock className="h-3 w-3 mr-1" /> : <CheckCircle className="h-3 w-3 mr-1" />}
@@ -119,7 +121,7 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
       </Badge>
 
       <div className="flex flex-col md:flex-row">
-        
+
         {/* Lewa Strona - Zdjęcie */}
         <div className="md:w-1/3 shrink-0 p-4 border-r border-gray-100">
           <img
@@ -133,27 +135,27 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
         <div className="md:w-2/3 grow">
           <CardHeader className="p-4 pb-2">
             <div className="flex items-center gap-3">
-                <div className={cn("shrink-0 p-2 rounded-full", categoryInfo.color === "text-purple-600" ? "bg-purple-100" : categoryInfo.color === "text-red-600" ? "bg-red-100" : categoryInfo.color === "text-blue-600" ? "bg-blue-100" : "bg-amber-100")}>
-                    <CategoryIcon category={category} className={cn("!w-6 !h-6", categoryInfo.color)} />
-                </div>
-                <div>
-                    <CardTitle className="text-xl font-extrabold leading-snug">{title}</CardTitle>
-                    <p className="text-sm text-muted-foreground font-medium mt-0.5">{categoryInfo.name}</p>
-                </div>
+              <div className={cn("shrink-0 p-2 rounded-full", categoryInfo.color === "text-purple-600" ? "bg-purple-100" : categoryInfo.color === "text-red-600" ? "bg-red-100" : categoryInfo.color === "text-blue-600" ? "bg-blue-100" : "bg-amber-100")}>
+                <CategoryIcon category={category} className={cn("!w-6 !h-6", categoryInfo.color)} />
+              </div>
+              <div>
+                <CardTitle className="text-xl font-extrabold leading-snug">{title}</CardTitle>
+                <p className="text-sm text-muted-foreground font-medium mt-0.5">{categoryInfo.name}</p>
+              </div>
             </div>
           </CardHeader>
 
-          <CardContent className="p-4 pt-0 space-y-3">
-            
+          <CardContent className="flex flex-col px-4 justify-between">
+
             {/* Opis */}
             {description && (
-                <CardDescription className="text-gray-700 text-sm italic line-clamp-2">
-                    "{description}"
-                </CardDescription>
+              <CardDescription className="text-gray-700 text-sm italic line-clamp-2">
+                "{description}"
+              </CardDescription>
             )}
 
             {/* Metadane */}
-            <div className="flex flex-wrap items-center gap-x-6 gap-y-2 text-gray-500 text-xs pt-1 border-t pt-2 mt-2">
+            <div className="flex flex-wrap justify-between items-center gap-x-6 gap-y-2 text-gray-500 text-xs pt-1 border-t pt-2 mt-2">
               {distance && (
                 <div className="flex items-center font-medium">
                   <MapPin className="h-3.5 w-3.5 mr-1.5 text-red-500" />
@@ -166,24 +168,19 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
               </div>
               {address && (
                 <span className="truncate max-w-[200px] text-gray-600">
-                    <MapPin className="h-3.5 w-3.5 mr-1.5 inline-block" />
-                    {address}
+                  <MapPin className="h-3.5 w-3.5 mr-1.5 inline-block" />
+                  {address}
                 </span>
               )}
+              {
+                isActivatable && (
+                  <SubmitJobDialog wasteJobId={id} />
+                )
+              }
             </div>
           </CardContent>
-          
-          {/* Stopka z przyciskiem akcji */}
-          <CardFooter className="p-4 border-t bg-gray-50">
-            <Button 
-                onClick={() => onClaimJob(id)}
-                disabled={!isClaimable || isButtonDisabled}
-                className="w-full transition-all duration-300"
-                variant={isClaimable ? "default" : "secondary"}
-            >
-                {isClaimable ? "Wypełnij Zlecenie" : `Status: ${statusTranslations[status]}`}
-            </Button>
-          </CardFooter>
+
+
 
         </div>
       </div>
