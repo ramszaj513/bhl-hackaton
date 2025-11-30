@@ -173,7 +173,7 @@ export function WasteJobForm() {
   }
 
   return (
-    <Card className="max-w-xl mx-auto shadow-lg">
+    <Card className="max-w-xl shadow-lg h-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-primary">
           Znajdź Gdzie Wyrzucić Odpad
@@ -181,11 +181,11 @@ export function WasteJobForm() {
       </CardHeader>
       <form onSubmit={handleSubmit}>
         <CardContent className="space-y-3 pt-1">
-          
+
           {/* Sekcja Zdjęcie (wymagane) */}
           <div className="space-y-2">
             <Label className="font-semibold text-base">
-                Załącz zdjęcie odpadu
+              Załącz zdjęcie odpadu
             </Label>
             <div className="mt-1 flex justify-center px-6 pt-5 pb-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary/50 transition-colors duration-200">
               <div className="space-y-1 text-center">
@@ -234,13 +234,13 @@ export function WasteJobForm() {
           </div>
 
           <Separator />
-          
+
           {/* Sekcja Opis (OPCJONALNA) */}
           <div className="space-y-2">
             <Label htmlFor="description" className="font-semibold text-base flex items-center justify-between">
               <span>Opis</span>
               <span className="text-xs text-primary flex items-center">
-                  <Zap className="h-3 w-3 mr-1" /> AI może wypełnić to za Ciebie!
+                <Zap className="h-3 w-3 mr-1" /> AI może wypełnić to za Ciebie!
               </span>
             </Label>
             <Textarea
@@ -260,10 +260,10 @@ export function WasteJobForm() {
             <Label className="font-semibold text-base flex items-center justify-between">
               <span>Wybierz Kategorię Odpadu</span>
               <span className="text-xs text-primary flex items-center">
-                  <Zap className="h-3 w-3 mr-1" /> AI może rozpoznać to ze zdjęcia!
+                <Zap className="h-3 w-3 mr-1" /> AI może rozpoznać to ze zdjęcia!
               </span>
             </Label>
-            
+
             {/* Zmiana z grid-cols-2 na grid-cols-4 na dużych ekranach i mniejszy padding */}
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {WASTE_CATEGORIES.map((category) => (
@@ -272,10 +272,9 @@ export function WasteJobForm() {
                   htmlFor={`category-${category.id}`}
                   className={`
                     flex flex-col items-center justify-center space-y-1 p-3 border rounded-lg cursor-pointer transition-all h-24
-                    ${
-                      selectedCategory === category.id
-                        ? "border-primary ring-2 ring-primary/50 bg-primary/10"
-                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
+                    ${selectedCategory === category.id
+                      ? "border-primary ring-2 ring-primary/50 bg-primary/10"
+                      : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                     }
                   `}
                 >
@@ -287,7 +286,7 @@ export function WasteJobForm() {
                     checked={selectedCategory === category.id}
                     onChange={handleCategoryChange}
                     className="sr-only"
-                    // Usunięto 'required'
+                  // Usunięto 'required'
                   />
                   <CategoryIcon category={category.iconKey} className="!w-6 !h-6" />
                   <span className="font-medium text-xs text-center block">
@@ -296,22 +295,22 @@ export function WasteJobForm() {
                 </Label>
               ))}
             </div>
-            
+
             {/* Opcjonalne: przycisk resetujący wybór kategorii */}
             {selectedCategory && (
-                <div className="text-right">
-                    <Button 
-                        type="button" 
-                        variant="ghost" 
-                        onClick={() => setSelectedCategory(null)}
-                        className="text-xs text-muted-foreground hover:text-primary h-auto p-0"
-                    >
-                        Anuluj wybór kategorii
-                    </Button>
-                </div>
+              <div className="text-right">
+                <Button
+                  type="button"
+                  variant="ghost"
+                  onClick={() => setSelectedCategory(null)}
+                  className="text-xs text-muted-foreground hover:text-primary h-auto p-0"
+                >
+                  Anuluj wybór kategorii
+                </Button>
+              </div>
             )}
           </div>
-          
+
           {/* Komunikaty o błędach i sukcesie */}
           {error && <p className="text-sm text-destructive">{error}</p>}
           {success && <p className="text-sm text-green-600">{success}</p>}
@@ -319,12 +318,12 @@ export function WasteJobForm() {
         <CardFooter className="mt-6">
           <Button type="submit" disabled={isLoading} className="w-full text-lg h-12">
             {isLoading ? (
-                <>
-                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                    Przesyłanie...
-                </>
+              <>
+                <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                Przesyłanie...
+              </>
             ) : (
-                "Znajdź gdzie wyrzucić przedmiot"
+              "Znajdź gdzie wyrzucić przedmiot"
             )}
           </Button>
         </CardFooter>

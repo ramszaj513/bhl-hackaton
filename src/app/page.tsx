@@ -8,11 +8,11 @@ export default async function Home() {
   await auth.protect();
 
   // Asynchroniczne pobieranie punktów dostawy odpadów
-  const deliveryPoints= await getWasteDeliveryPoints();
+  const deliveryPoints = await getWasteDeliveryPoints();
 
   return (
     <div className="relative h-full overflow-hidden">
-      
+
       {/* 1. Mapa Tła - Ograniczona do 3/4 szerokości (w-3/4) */}
       <div className="fixed top-0 right-0 w-4/5 h-full -z-10">
         <Suspense fallback={
@@ -21,13 +21,13 @@ export default async function Home() {
           </div>
         }>
           {/* Używamy full height/width wewnątrz kontenera w-3/4 */}
-          <MapComponent deliveryPoints={deliveryPoints} pickupPoints={[]}/>
+          <MapComponent deliveryPoints={deliveryPoints} pickupPoints={[]} />
         </Suspense>
       </div>
 
       {/* 2. Warstwa z Efektem Rozmycia/Gradientu - Bardziej Gwałtowna */}
       {/* Ograniczamy gradient do lewej strony ekranu (tej, która ma być biała) */}
-      <div 
+      <div
         className="fixed inset-0 w-full h-full -z-0"
         style={{
           // Zmieniono przejście z (35% -> 40%) na (30% -> 45%) dla płynniejszego efektu
@@ -37,15 +37,15 @@ export default async function Home() {
 
       {/* 3. Kontener Formularza */}
       {/* Używamy flex, aby formularz był z lewej, a 3/4 ekranu (mapa) z prawej */}
-      <div className="relative z-20 px-8 py-4 h-full flex justify-start items-center overflow-hidden">
-        
+      <div className="relative z-20 px-8 py-4 h-full flex justify-start items-start">
+        <WasteJobForm />
         {/* Ograniczamy wysokość kontenera formularza, np. do 90% wysokości viewportu, aby zmieścił się z paddingami */}
-        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 backdrop-blur-sm overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 80px)' }}>
-              <WasteJobForm />
-        </div>
+        {/* <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 backdrop-blur-sm overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+              
+        </div> */}
 
       </div>
-      
+
     </div>
   );
 }
