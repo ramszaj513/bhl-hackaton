@@ -3,11 +3,11 @@
 import { useRef, useState, useEffect } from 'react';
 import MapProvider from './mapbox/provider';
 
-import { WasteDeliveryPointType } from '@/src/db/schema';
+import { WasteDeliveryPointType, WasteJobType } from '@/src/db/schema';
 import WastePointMarker from './waste-point-marker';
 import RouteLayer from './mapbox/route-layer';
 import { Feature, LineString } from 'geojson';
-import { WasteJob } from './waste-job-card';
+
 import WasteJobMarker from './waste-job-marker';
 
 
@@ -19,7 +19,7 @@ const MOCK_START_POINT = {
 
 export default function MapComponent({ deliveryPoints, pickupPoints, startingPoint = MOCK_START_POINT, targetCategory }: {
     deliveryPoints: WasteDeliveryPointType[];
-    pickupPoints: WasteJob[];
+    pickupPoints: WasteJobType[];
     targetCategory?: WasteDeliveryPointType['category'];
     startingPoint?: { longitude: number; latitude: number };
 }) {

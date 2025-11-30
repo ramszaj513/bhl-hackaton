@@ -83,7 +83,7 @@ export function WasteJobList() {
   }
 
   return (
-    <div className="space-y-4">
+    <div className="w-120 h-full space-y-4">
       {wasteJobs.map((job) => (
         <WasteJobCard key={job.id} wasteJob={job} variant={job.status} onClaimJob={handleJobClaim} />
       ))}

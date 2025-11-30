@@ -1,14 +1,11 @@
-import { WasteDeliveryPointType } from "@/src/db/schema";
+import { WasteJobType } from "@/src/db/schema";
 import Marker from "./mapbox/marker";
 import CategoryIcon from "./category-icon";
-import { useState } from "react";
-import { cn } from "@/src/lib/utils";
-import { WasteJob } from "./waste-job-card";
 
 export default function WastePointMarker({
     point,
 }: {
-    point: WasteJob;
+    point: WasteJobType;
 }) {
     return (
         <Marker

@@ -63,3 +63,6 @@ export const wastejob = pgTable('wastejob', {
   pickupLatitude: numeric('pickup_latitude', { precision: 10, scale: 7 }).notNull(),
   pickupLongitude: numeric('pickup_longitude', { precision: 10, scale: 7 }).notNull(),
 });
+
+
+export type WasteJobType = InferSelectModel<typeof wastejob>;
