@@ -38,12 +38,9 @@ export default async function Home() {
 
       {/* 3. Kontener Formularza */}
       {/* Używamy flex, aby formularz był z lewej, a 3/4 ekranu (mapa) z prawej */}
-      <div className="relative z-20 px-8 py-4 h-full flex justify-start items-center overflow-hidden">
 
-        {/* Ograniczamy wysokość kontenera formularza, np. do 90% wysokości viewportu, aby zmieścił się z paddingami */}
-        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 backdrop-blur-sm overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 80px)' }}>
-          <WasteJobList />
-        </div>
+      <div className="relative z-20 px-8 py-4 h-full flex justify-start items-start">
+        <WasteJobList />
       </div>
     </div>
   );

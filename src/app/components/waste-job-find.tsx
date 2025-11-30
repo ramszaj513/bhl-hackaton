@@ -22,23 +22,34 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleLocationSelect = (location: any) => {
-    setSelectedLocation(location);
-    console.log("Selected location:", location);
-  };
+  const getLatLon = () => {
+    let lat: number | undefined;
+    let lon: number | undefined;
+
+    if (selectedLocation.properties && selectedLocation.properties.lat && selectedLocation.properties.lon) {
+      lat = selectedLocation.properties.lat;
+      lon = selectedLocation.properties.lon;
+    } else if (selectedLocation.geometry && selectedLocation.geometry.coordinates) {
+      lon = selectedLocation.geometry.coordinates[0];
+      lat = selectedLocation.geometry.coordinates[1];
+    }
+
+    if (lat === undefined || lon === undefined) {
+      console.error("Could not extract coordinates from selection");
+      return { lat: undefined, lon: undefined };
+    }
+
+    return { lat, lon };
+  }
 
   const handleFindNearest = async () => {
     if (!selectedLocation) return;
-    
+
     setIsLoading(true);
     try {
-      // TODO: Implement find nearest waste delivery point logic
-      const { lat, lon } = selectedLocation.properties;
+      const { lat, lon } = getLatLon();
       console.log("Finding nearest point for:", lat, lon);
-      
-      // Placeholder for actual implementation
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      
+
       setShowAddressPicker(null);
       onComplete?.();
     } catch (error) {
@@ -49,39 +60,35 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
   };
 
   const handleDelegate = async () => {
-    if (!selectedLocation) return;
-    
+    if (!selectedLocation || !jobId) return;
+
     setIsLoading(true);
     try {
-      const { lat, lon } = selectedLocation.properties;
-      
+      const { lat, lon } = getLatLon();
       const response = await fetch("/api/wastejobs/activate", {
         method: "PUT",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          wastejobId: jobId,
-          pickupLatitude: lat.toString(),
-          pickupLongitude: lon.toString(),
+          wastejobId: jobId.toString(),
+          lat,
+          lon,
         }),
       });
 
       if (!response.ok) {
-        throw new Error("Failed to activate waste job");
+        throw new Error("Failed to activate job");
       }
-
-      setShowAddressPicker(null);
-      onComplete?.();
     } catch (error) {
-      console.error("Error delegating job:", error);
+      console.error("Error activating job:", error);
     } finally {
       setIsLoading(false);
     }
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-2xl w-120">
       <CardHeader>
         <CardTitle>Co chcesz zrobić z odpadem?</CardTitle>
         <CardDescription>
@@ -127,7 +134,7 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
                   ? "Wprowadź adres do wyszukania punktu"
                   : "Wprowadź adres odbioru"}
               </label>
-              <LocationPicker onLocationSelect={handleLocationSelect} />
+              <LocationPicker onLocationSelect={setSelectedLocation} />
             </div>
 
             <div className="flex gap-2">
@@ -149,8 +156,8 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
                 {isLoading
                   ? "Przetwarzanie..."
                   : showAddressPicker === "find"
-                  ? "Znajdź punkt"
-                  : "Aktywuj zlecenie"}
+                    ? "Znajdź punkt"
+                    : "Aktywuj zlecenie"}
               </Button>
             </div>
           </div>

@@ -11,7 +11,7 @@ export default async function Home() {
   const deliveryPoints = await getWasteDeliveryPoints();
 
   return (
-    <div className="relative h-full overflow-hidden">
+    <div className="relative h-full">
 
       {/* 1. Mapa Tła - Ograniczona do 3/4 szerokości (w-3/4) */}
       <div className="fixed top-0 right-0 w-4/5 h-full -z-10">

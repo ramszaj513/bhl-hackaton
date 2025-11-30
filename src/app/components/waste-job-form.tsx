@@ -21,7 +21,7 @@ import { Loader2, Zap } from "lucide-react"; // Dodano ikonę Zap
 import { WasteJobFind } from "./waste-job-find";
 
 type CategoryId = "pszok" | "small_electronics" | "electronics" | "expired_medications";
-  
+
 interface WasteCategory {
   id: CategoryId;
   name: string;
@@ -173,7 +173,7 @@ export function WasteJobForm() {
   }
 
   return (
-    <Card className="max-w-xl shadow-lg h-full">
+    <Card className="max-w-xl w-120 shadow-lg h-full">
       <CardHeader>
         <CardTitle className="text-2xl font-bold text-primary">
           Znajdź Gdzie Wyrzucić Odpad

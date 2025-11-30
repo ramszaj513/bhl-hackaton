@@ -13,7 +13,6 @@ import { wasteCategory, wasteJobStatus } from "@/src/db/schema";
 import { VariantProps, cva } from "class-variance-authority";
 import { cn, getBase64Image } from "@/src/lib/utils";
 import CategoryIcon from "./category-icon";
-import { SubmitJobDialog } from "./submit-job-dialog";
 
 export type WasteJob = {
   id: number;
@@ -105,14 +104,13 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
   });
 
   const isClaimable = status === "active";
-  const isActivatable = status === "draft";
 
   // ----------------------------------------------------
   // 2. Ulepszony wygląd komponentu
   // ----------------------------------------------------
 
   return (
-    <Card className="w-full max-w-2xl mx-auto border-2 border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 relative overflow-hidden">
+    <Card className="w-full max-w-2xl mx-auto border-2 border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 relative">
 
       {/* Badge Statusu - na górze po prawej */}
       <Badge className={cn(badgeVariants({ variant: status }), "z-10")}>
@@ -172,11 +170,6 @@ export function WasteJobCard({ wasteJob, onClaimJob, isButtonDisabled }: WasteJo
                   {address}
                 </span>
               )}
-              {
-                isActivatable && (
-                  <SubmitJobDialog wasteJobId={id} />
-                )
-              }
             </div>
           </CardContent>
 

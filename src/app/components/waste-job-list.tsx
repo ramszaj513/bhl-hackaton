@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { WasteJob, WasteJobCard } from "./waste-job-card";
 import { Loader2 } from "lucide-react";
-import MapComponent from "./map";
 
 export function WasteJobList() {
   const [wasteJobs, setWasteJobs] = useState<WasteJob[]>([]);
@@ -25,7 +24,7 @@ export function WasteJobList() {
       }
 
       const updatedJob = await response.json();
-      
+
       // Update the local state to reflect the claimed job
       setWasteJobs((prevJobs) =>
         prevJobs.map((job) =>
@@ -85,9 +84,8 @@ export function WasteJobList() {
 
   return (
     <div className="space-y-4">
-     
       {wasteJobs.map((job) => (
-        <WasteJobCard key={job.id} wasteJob={job} variant={job.status} onClaimJob={handleJobClaim}/>
+        <WasteJobCard key={job.id} wasteJob={job} variant={job.status} onClaimJob={handleJobClaim} />
       ))}
     </div>
   );
