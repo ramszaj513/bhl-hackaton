@@ -9,6 +9,34 @@ export function WasteJobList() {
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
+  const handleJobClaim = async (wastejobId: number) => {
+    try {
+      const response = await fetch("/api/wastejobs/claim", {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ wastejobId: wastejobId.toString() }),
+      });
+
+      if (!response.ok) {
+        throw new Error("Failed to claim waste job");
+      }
+
+      const updatedJob = await response.json();
+      
+      // Update the local state to reflect the claimed job
+      setWasteJobs((prevJobs) =>
+        prevJobs.map((job) =>
+          job.id === wastejobId ? { ...job, ...updatedJob } : job
+        )
+      );
+    } catch (err: any) {
+      console.error("Error claiming job:", err);
+      setError(err.message);
+    }
+  };
+
   useEffect(() => {
     const fetchWasteJobs = async () => {
       try {
@@ -57,7 +85,7 @@ export function WasteJobList() {
   return (
     <div className="space-y-4">
       {wasteJobs.map((job) => (
-        <WasteJobCard key={job.id} wasteJob={job} variant={job.status} />
+        <WasteJobCard key={job.id} wasteJob={job} variant={job.status} onClaimJob={handleJobClaim}/>
       ))}
     </div>
   );
