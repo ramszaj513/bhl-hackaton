@@ -1,7 +1,10 @@
 import { getWasteDeliveryPoints } from "@/src/lib/waste-delivery-points";
 import MapComponent from "@/src/app/components/map";
+import { auth } from "@clerk/nextjs/server";
 
 export default async function MapPage() {
+    await auth.protect();
+
     const points = await getWasteDeliveryPoints();
 
     return (

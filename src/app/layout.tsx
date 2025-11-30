@@ -1,16 +1,9 @@
 import { ClerkProvider } from "@clerk/nextjs";
 import type { Appearance } from "@clerk/types";
 import "./styles/globals.css";
-import "./styles/latex.css";
 import Script from "next/script";
-import { Metadata } from "next";
 import { NavigationMenuBar } from "./components/navigation-menu-bar";
 
-export const metadata: Metadata = {
-  metadataBase: new URL("https://mathdb.vercel.app/"),
-  title: "MathDB",
-  description: "A simple database for problems from math competitions",
-};
 
 /**
  * This object can be customized to change Clerk's built-in appearance. To learn more: https://clerk.com/docs/customization/overview
