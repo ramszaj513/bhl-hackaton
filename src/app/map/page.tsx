@@ -11,7 +11,7 @@ export default async function MapPage() {
         <div className="w-full h-full p-4">
             <h1 className="text-2xl font-bold mb-4">Waste Delivery Points</h1>
             <div className="w-full h-[calc(100vh-200px)]">
-                <MapComponent points={points} />
+                <MapComponent points={points} targetCategory="small_electronics" />
             </div>
         </div>
     );

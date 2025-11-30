@@ -1,17 +1,81 @@
 "use client";
 
-import { useRef } from 'react';
+import { useRef, useState, useEffect } from 'react';
 import MapProvider from './mapbox/provider';
 
 import { WasteDeliveryPointType } from '@/src/db/schema';
 import WastePointMarker from './waste-point-marker';
+import RouteLayer from './mapbox/route-layer';
+import { Feature, LineString } from 'geojson';
 
-interface MapComponentProps {
+
+const MOCK_START_POINT = {
+    longitude: 21.0122, // Warsaw center
+    latitude: 52.2297
+};
+
+
+export default function MapComponent({ points, startingPoint = MOCK_START_POINT, targetCategory }: {
     points: WasteDeliveryPointType[];
-}
-
-export default function MapComponent({ points }: MapComponentProps) {
+    targetCategory?: WasteDeliveryPointType['category'];
+    startingPoint?: { longitude: number; latitude: number };
+}) {
     const mapContainerRef = useRef<HTMLDivElement>(null);
+    const [routeGeoJSON, setRouteGeoJSON] = useState<Feature<LineString> | null>(null);
+
+    useEffect(() => {
+        if (!targetCategory) {
+            setRouteGeoJSON(null);
+            return;
+        }
+
+        const categoryPoints = points.filter(p => p.category === targetCategory);
+        if (categoryPoints.length === 0) {
+            setRouteGeoJSON(null);
+            return;
+        }
+
+        // Find nearest point using simple Euclidean distance for approximation
+        let nearestPoint = categoryPoints[0];
+        let minDistance = Infinity;
+
+        categoryPoints.forEach(point => {
+            const dist = Math.sqrt(
+                Math.pow(parseFloat(point.lon) - startingPoint.longitude, 2) +
+                Math.pow(parseFloat(point.lat) - startingPoint.latitude, 2)
+            );
+            if (dist < minDistance) {
+                minDistance = dist;
+                nearestPoint = point;
+            }
+        });
+
+        // Fetch route from Mapbox Directions API
+        const fetchRoute = async () => {
+            try {
+                const query = await fetch(
+                    `https://api.mapbox.com/directions/v5/mapbox/driving/${MOCK_START_POINT.longitude},${MOCK_START_POINT.latitude};${nearestPoint.lon},${nearestPoint.lat}?steps=true&geometries=geojson&access_token=${process.env.NEXT_PUBLIC_MAPBOX_TOKEN}`,
+                    { method: 'GET' }
+                );
+                const json = await query.json();
+                if (json.routes && json.routes.length > 0) {
+                    const data = json.routes[0];
+                    const route = data.geometry;
+
+                    setRouteGeoJSON({
+                        type: 'Feature',
+                        properties: {},
+                        geometry: route
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching route:", error);
+            }
+        };
+
+        fetchRoute();
+
+    }, [targetCategory, points]);
 
     return (
         <div className="w-full h-full min-h-[500px] rounded-lg overflow-hidden relative">
@@ -19,14 +83,15 @@ export default function MapComponent({ points }: MapComponentProps) {
             <MapProvider
                 mapContainerRef={mapContainerRef}
                 initialViewState={{
-                    longitude: 21.0122, // Default to Warsaw
-                    latitude: 52.2297,
-                    zoom: 11
+                    longitude: startingPoint.longitude,
+                    latitude: startingPoint.latitude,
+                    zoom: 13
                 }}
             >
                 {points.map(point => (
                     <WastePointMarker key={point.id} point={point} />
                 ))}
+                <RouteLayer routeGeoJSON={routeGeoJSON} />
             </MapProvider>
         </div>
     );

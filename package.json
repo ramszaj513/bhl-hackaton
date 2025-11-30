@@ -49,6 +49,7 @@
   },
   "devDependencies": {
     "@clerk/types": "^4.101.2",
+    "@types/geojson": "^7946.0.16",
     "@types/mapbox-gl": "^3.4.1",
     "@types/react-map-gl": "^6.1.7",
     "drizzle-kit": "^0.31.7"
