@@ -24,9 +24,10 @@ const CATEGORY_NAMES: Record<string, string> = {
 interface WasteJobFindProps {
   onComplete?: () => void;
   jobId?: string | null;
+  onShowRoute?: (location: { latitude: number; longitude: number }, category: string) => void;
 }
 
-export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
+export function WasteJobFind({ onComplete, jobId, onShowRoute }: WasteJobFindProps) {
   const [showAddressPicker, setShowAddressPicker] = useState<"find" | "delegate" | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
@@ -79,6 +80,10 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
     try {
       const { lat, lon } = getLatLon();
       console.log("Finding nearest point for:", lat, lon);
+
+      if (wasteJobCategory && onShowRoute && lat !== undefined && lon !== undefined) {
+        onShowRoute({ latitude: lat, longitude: lon }, wasteJobCategory);
+      }
 
       setShowAddressPicker(null);
       onComplete?.();

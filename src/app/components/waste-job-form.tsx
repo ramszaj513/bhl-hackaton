@@ -60,7 +60,11 @@ const WASTE_CATEGORIES: WasteCategory[] = [
 // Komponent Formularza
 // -----------------------------------------------------------------
 
-export function WasteJobForm() {
+interface WasteJobFormProps {
+  onShowRoute?: (location: { latitude: number; longitude: number }, category: string) => void;
+}
+
+export function WasteJobForm({ onShowRoute }: WasteJobFormProps) {
   const [formData, setFormData] = useState<Partial<CreateWastejobDto>>({
     description: "",
   });
@@ -169,7 +173,7 @@ export function WasteJobForm() {
   };
 
   if (showNextStep) {
-    return <WasteJobFind onComplete={handleComplete} jobId={createdJobId} />;
+    return <WasteJobFind onComplete={handleComplete} jobId={createdJobId} onShowRoute={onShowRoute} />;
   }
 
   return (
