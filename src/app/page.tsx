@@ -8,7 +8,7 @@ export default async function Home() {
   await auth.protect();
 
   // Asynchroniczne pobieranie punktów dostawy odpadów
-  const points = await getWasteDeliveryPoints();
+  const deliveryPoints= await getWasteDeliveryPoints();
 
   return (
     <div className="relative h-full overflow-hidden">
@@ -21,7 +21,7 @@ export default async function Home() {
           </div>
         }>
           {/* Używamy full height/width wewnątrz kontenera w-3/4 */}
-          <MapComponent points={points} />
+          <MapComponent deliveryPoints={deliveryPoints} pickupPoints={[]}/>
         </Suspense>
       </div>
 
