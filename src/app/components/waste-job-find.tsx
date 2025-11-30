@@ -1,6 +1,7 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { useRouter, useSearchParams, usePathname } from "next/navigation";
 import {
   Card,
   CardContent,
@@ -21,6 +22,27 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
   const [showAddressPicker, setShowAddressPicker] = useState<"find" | "delegate" | null>(null);
   const [selectedLocation, setSelectedLocation] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [wasteJobCategory, setWasteJobCategory] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchWasteJob = async () => {
+      if (!jobId) return;
+
+      try {
+        const response = await fetch(`/api/wastejobs/${jobId}`);
+        if (!response.ok) throw new Error("Failed to fetch waste job");
+
+        const data = await response.json();
+        if (data.category) {
+          setWasteJobCategory(data.category);
+        }
+      } catch (error) {
+        console.error("Error fetching waste job:", error);
+      }
+    };
+
+    fetchWasteJob();
+  }, [jobId]);
 
   const getLatLon = () => {
     let lat: number | undefined;
@@ -92,6 +114,11 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
       <CardHeader>
         <CardTitle>Co chcesz zrobić z odpadem?</CardTitle>
         <CardDescription>
+          {wasteJobCategory && (
+            <span className="block mb-2 font-medium text-primary">
+              Kategoria: {wasteJobCategory}
+            </span>
+          )}
           Wybierz jedną z opcji, aby kontynuować
         </CardDescription>
       </CardHeader>
