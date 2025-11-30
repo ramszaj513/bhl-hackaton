@@ -30,17 +30,17 @@ export async function getWastejobById(id: number) {
 
 export async function createWastejob(id: string, data: CreateWastejobDto) {
 
-  let category = data.category;
+  let finalcategory = data.category;
 
-  const { predictedCategory, title } = await getCategoryPrediction(data.imageData, data.description)
+  const { category, title } =  await getCategoryPrediction(data.imageData, data.description)
 
-  if (category && predictedCategory != category) {
+  if(data.category && finalcategory != category){
     console.error("Error: the predicted category doesnt match the chosen one");
     throw new Error("Failed to create wastejob");
   }
 
-  if (!category) {
-    category = predictedCategory;
+  if(!category){
+    finalcategory = category;
   }
 
   if (!category) {

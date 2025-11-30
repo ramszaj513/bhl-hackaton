@@ -79,7 +79,7 @@ export async function getCategoryPrediction(
 
   Note: If an item fits "small_electronics", "electronics", or "expired_medications" specifically, prefer those categories over "pszok". Use "pszok" for the other items listed above (e.g. furniture, chemicals, construction waste, tires, etc.).
 
-  If the object is identified, return the matching category and a concise title.
+  If the object is identified, return the matching category and a concise title in polish.
   If the object cannot be identified or doesn't fit these categories, return "ERROR" as the category and "Cannot identify item" as the title.
   
   Description: ${description || "N/A"}`;

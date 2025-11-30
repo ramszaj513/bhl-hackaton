@@ -18,13 +18,10 @@ import {
 import { convertFileToBase64 } from "@/src/lib/utils";
 import CategoryIcon from "./category-icon";
 import { Loader2, Zap } from "lucide-react"; // Dodano ikonę Zap
-
-// -----------------------------------------------------------------
-// Typy i Stałe
-// -----------------------------------------------------------------
+import { WasteJobFind } from "./waste-job-find";
 
 type CategoryId = "pszok" | "small_electronics" | "electronics" | "expired_medications";
-
+  
 interface WasteCategory {
   id: CategoryId;
   name: string;
@@ -73,6 +70,8 @@ export function WasteJobForm() {
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
+  const [showNextStep, setShowNextStep] = useState(false);
+  const [createdJobId, setCreatedJobId] = useState<string | null>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -140,12 +139,10 @@ export function WasteJobForm() {
         throw new Error(errorData.error || "Nie udało się utworzyć zlecenia.");
       }
 
-      setSuccess("Pomyślnie wysłano zapytanie! Sprawdź mapę, aby zobaczyć punkty odbioru.");
-      // Resetowanie formularza
-      setFormData({ description: "" });
-      setFile(null);
-      setPreview(null);
-      setSelectedCategory(null);
+      const result = await response.json();
+      setCreatedJobId(result.id?.toString() || null);
+      setSuccess("Pomyślnie wysłano zapytanie! Wybierz co chcesz zrobić dalej.");
+      setShowNextStep(true);
 
     } catch (err: any) {
       setError(err.message || "Wystąpił nieoczekiwany błąd.");
@@ -158,6 +155,22 @@ export function WasteJobForm() {
     const value = e.target.value as CategoryId;
     setSelectedCategory(value);
   };
+
+  const handleComplete = () => {
+    // Reset all form state
+    setFormData({ description: "" });
+    setFile(null);
+    setPreview(null);
+    setSelectedCategory(null);
+    setShowNextStep(false);
+    setCreatedJobId(null);
+    setSuccess(null);
+    setError(null);
+  };
+
+  if (showNextStep) {
+    return <WasteJobFind onComplete={handleComplete} jobId={createdJobId} />;
+  }
 
   return (
     <Card className="max-w-xl mx-auto shadow-lg">
