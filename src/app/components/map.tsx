@@ -2,19 +2,12 @@
 
 import { useRef } from 'react';
 import MapProvider from './mapbox/provider';
-import Marker from './mapbox/marker';
-import CategoryIcon from './category-icon';
 
-interface WasteDeliveryPoint {
-    id: string;
-    lat: string;
-    lon: string;
-    description: string;
-    category: string;
-}
+import { WasteDeliveryPointType } from '@/src/db/schema';
+import WastePointMarker from './waste-point-marker';
 
 interface MapComponentProps {
-    points: WasteDeliveryPoint[];
+    points: WasteDeliveryPointType[];
 }
 
 export default function MapComponent({ points }: MapComponentProps) {
@@ -32,19 +25,7 @@ export default function MapComponent({ points }: MapComponentProps) {
                 }}
             >
                 {points.map(point => (
-                    <Marker
-                        key={point.id}
-                        longitude={parseFloat(point.lon)}
-                        latitude={parseFloat(point.lat)}
-                        data={point}
-                    >
-                        <div
-                            className={`cursor-pointer hover:scale-110 transition-transform flex items-center justify-center`}
-                            title={`${point.description} (${point.category})`}
-                        >
-                            <CategoryIcon category={point.category} />
-                        </div>
-                    </Marker>
+                    <WastePointMarker key={point.id} point={point} />
                 ))}
             </MapProvider>
         </div>

@@ -9,6 +9,7 @@ import {
   varchar,
   timestamp,
 } from "drizzle-orm/pg-core";
+import { InferSelectModel } from "drizzle-orm";
 
 export const wasteCategory = pgEnum("waste_category", [
   "pszok",
@@ -36,6 +37,8 @@ export const WasteDeliveryPoint = pgTable("waste_delivery_point", {
   category: wasteCategory("category").notNull(),
 });
 
+export type WasteDeliveryPointType = InferSelectModel<typeof WasteDeliveryPoint>;
+
 export const wasteJobStatus = pgEnum("waste_job_status", [
   "draft",
   "active",
@@ -46,7 +49,7 @@ export const wasteJobStatus = pgEnum("waste_job_status", [
 export const wastejob = pgTable('wastejob', {
   id: serial('id').primaryKey(),
   createdById: text('created_by_id').notNull(),
-  claimedById: text('claimed_by_id'), 
+  claimedById: text('claimed_by_id'),
   status: wasteJobStatus('status').notNull(),
   createdAt: timestamp('created_at').notNull().defaultNow(),
 
