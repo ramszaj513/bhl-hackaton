@@ -40,6 +40,14 @@ export default function MapProvider({
             logoPosition: "bottom-right",
         });
 
+        map.current.addControl(new mapboxgl.GeolocateControl({
+            positionOptions: {
+                enableHighAccuracy: true
+            },
+            trackUserLocation: true,
+            showUserHeading: true
+        }));
+
         map.current.on("load", () => {
             setLoaded(true);
         });
