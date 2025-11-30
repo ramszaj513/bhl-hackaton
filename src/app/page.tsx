@@ -11,7 +11,7 @@ export default async function Home() {
   const points = await getWasteDeliveryPoints();
 
   return (
-    <div className="relative min-h-screen overflow-hidden">
+    <div className="relative h-full overflow-hidden">
       
       {/* 1. Mapa Tła - Ograniczona do 3/4 szerokości (w-3/4) */}
       <div className="fixed top-0 right-0 w-4/5 h-full -z-10">
@@ -37,14 +37,14 @@ export default async function Home() {
 
       {/* 3. Kontener Formularza */}
       {/* Używamy flex, aby formularz był z lewej, a 3/4 ekranu (mapa) z prawej */}
-      <main className="relative z-10 md:px-8 lg:px-12 min-h-screen flex justify-start items-center">
+      <div className="relative z-20 px-8 py-4 h-full flex justify-start items-center overflow-hidden">
         
-        {/* Kontener formularza zajmuje lewą kolumnę */}
-        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 backdrop-blur-sm">
-             <WasteJobForm />
+        {/* Ograniczamy wysokość kontenera formularza, np. do 90% wysokości viewportu, aby zmieścił się z paddingami */}
+        <div className="w-full max-w-lg bg-white rounded-xl shadow-2xl border border-gray-100 backdrop-blur-sm overflow-y-auto scrollbar-hide" style={{ maxHeight: 'calc(100vh - 80px)' }}>
+              <WasteJobForm />
         </div>
 
-      </main>
+      </div>
       
     </div>
   );

@@ -13,9 +13,55 @@ import {
   CardFooter,
   CardHeader,
   CardTitle,
+  Separator, // Dodano Separator dla lepszej wizualnej separacji
 } from "./ui";
 import { convertFileToBase64 } from "@/src/lib/utils";
 import CategoryIcon from "./category-icon";
+import { Loader2, Zap } from "lucide-react"; // Dodano ikonę Zap
+
+// -----------------------------------------------------------------
+// Typy i Stałe
+// -----------------------------------------------------------------
+
+type CategoryId = "pszok" | "small_electronics" | "electronics" | "expired_medications";
+
+interface WasteCategory {
+  id: CategoryId;
+  name: string;
+  description: string; // Krótki opis do tooltipa
+  iconKey: string;
+}
+
+const WASTE_CATEGORIES: WasteCategory[] = [
+  {
+    id: "pszok",
+    name: "Gabaryty/PSZOK",
+    description: "Duże odpady, budowlane, itp.",
+    iconKey: "pszok",
+  },
+  {
+    id: "small_electronics",
+    name: "Mała Elektronika",
+    description: "Telefony, ładowarki, małe AGD.",
+    iconKey: "small_electronics",
+  },
+  {
+    id: "electronics",
+    name: "Duża Elektronika",
+    description: "Telewizory, lodówki, pralki.",
+    iconKey: "electronics",
+  },
+  {
+    id: "expired_medications",
+    name: "Lekarstwa i opdady medyczne",
+    description: "Przeterminowane leki.",
+    iconKey: "expired_medications",
+  },
+];
+
+// -----------------------------------------------------------------
+// Komponent Formularza
+// -----------------------------------------------------------------
 
 export function WasteJobForm() {
   const [formData, setFormData] = useState<Partial<CreateWastejobDto>>({
@@ -26,7 +72,7 @@ export function WasteJobForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
-  const [selectedCategory, setSelectedCategory] = useState<"pszok" | "small_electronics" | "electronics" | "expired_medications" | null>(null);
+  const [selectedCategory, setSelectedCategory] = useState<CategoryId | null>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -38,6 +84,7 @@ export function WasteJobForm() {
   const handleFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     const selectedFile = e.target.files?.[0];
     if (selectedFile) {
+      // Walidacja, że zdjęcie jest wymagane, nie zmienia się
       setFile(selectedFile);
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -47,48 +94,15 @@ export function WasteJobForm() {
     }
   };
 
-  interface WasteCategory {
-    id: string; 
-    name: string;
-    description?: string; 
-    iconKey: string; 
-  }
-
-  const WASTE_CATEGORIES: WasteCategory[] = [
-  {
-    id: "pszok",
-    name: "PSZOK",
-    description: "",
-    iconKey: "pszok",
-  },
-  {
-    id: "small_electronics",
-    name: "Mała Elektronika",
-    description: "",
-    iconKey: "small_electronics",
-  },
-  {
-    id: "electronics",
-    name: "Duża Elektronika",
-    description: "",
-    iconKey: "electronics",
-  },
-  {
-    id: "expired_medications",
-    name: "Lekarstwa i Odpady Medyczne",
-    description: "",
-    iconKey: "expired_medications",
-  },
-];
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     setSuccess(null);
 
+    // Zdjęcie nadal jest wymagane
     if (!file) {
-      setError("Picture is required.");
+      setError("Wymagane jest załączenie zdjęcia odpadu.");
       setIsLoading(false);
       return;
     }
@@ -101,14 +115,18 @@ export function WasteJobForm() {
       const pickupLongitude = "21.0122";
 
       const data: CreateWastejobDto = {
-        description: formData.description,
+        description: formData.description || "", // Opis jest teraz opcjonalny
         imageData: imageData,
         pickupLatitude,
         pickupLongitude,
       };
 
-      if(selectedCategory) { data.category = selectedCategory };
+      // Kategoria jest teraz opcjonalna
+      if (selectedCategory) {
+        data.category = selectedCategory;
+      }
 
+      // Symulacja wysyłania do API
       const response = await fetch("/api/wastejobs", {
         method: "POST",
         headers: {
@@ -119,44 +137,50 @@ export function WasteJobForm() {
 
       if (!response.ok) {
         const errorData = await response.json();
-        throw new Error(errorData.error || "Failed to create waste job");
+        throw new Error(errorData.error || "Nie udało się utworzyć zlecenia.");
       }
 
-      setSuccess("Waste job created successfully!");
-      setFormData({ title: "", description: "" });
+      setSuccess("Pomyślnie wysłano zapytanie! Sprawdź mapę, aby zobaczyć punkty odbioru.");
+      // Resetowanie formularza
+      setFormData({ description: "" });
       setFile(null);
       setPreview(null);
+      setSelectedCategory(null);
+
     } catch (err: any) {
-      setError(err.message);
+      setError(err.message || "Wystąpił nieoczekiwany błąd.");
     } finally {
       setIsLoading(false);
     }
   };
 
   const handleCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
-    const value = e.target.value as "pszok" | "small_electronics" | "electronics" | "expired_medications";
+    const value = e.target.value as CategoryId;
     setSelectedCategory(value);
   };
 
   return (
-    <Card className="max-w-2xl mx-auto">
+    <Card className="max-w-xl mx-auto shadow-lg">
       <CardHeader>
-        <CardTitle>Znajdź gdzie wyrzucić śmieci</CardTitle>
-        <CardDescription>
-          Fill out the details below to post a new job.
-        </CardDescription>
+        <CardTitle className="text-2xl font-bold text-primary">
+          Znajdź Gdzie Wyrzucić Odpad
+        </CardTitle>
       </CardHeader>
       <form onSubmit={handleSubmit}>
-        <CardContent className="space-y-6">
+        <CardContent className="space-y-3 pt-1">
+          
+          {/* Sekcja Zdjęcie (wymagane) */}
           <div className="space-y-2">
-            <Label>Załącz zdjęcie</Label>
-            <div className="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-dashed rounded-md">
+            <Label className="font-semibold text-base">
+                Załącz zdjęcie odpadu
+            </Label>
+            <div className="mt-1 flex justify-center px-6 pt-5 pb-4 border-2 border-dashed border-gray-300 rounded-lg hover:border-primary/50 transition-colors duration-200">
               <div className="space-y-1 text-center">
                 {preview ? (
                   <img
                     src={preview}
-                    alt="Preview"
-                    className="mx-auto h-48 w-auto rounded-md"
+                    alt="Podgląd załączonego pliku"
+                    className="mx-auto h-20 w-auto rounded-md object-contain shadow-md"
                   />
                 ) : (
                   <svg
@@ -174,12 +198,12 @@ export function WasteJobForm() {
                     />
                   </svg>
                 )}
-                <div className="flex text-sm">
+                <div className="flex text-sm justify-center">
                   <Label
                     htmlFor="file-upload"
                     className="relative cursor-pointer rounded-md font-medium text-primary hover:text-primary/80 focus-within:outline-none"
                   >
-                    <span>Upload a file</span>
+                    <span>Prześlij plik</span>
                     <Input
                       id="file-upload"
                       name="file-upload"
@@ -189,35 +213,56 @@ export function WasteJobForm() {
                       accept="image/*"
                     />
                   </Label>
-                  <p className="pl-1">or drag and drop</p>
+                  <p className="pl-1 text-gray-600">lub przeciągnij i upuść</p>
                 </div>
-                <p className="text-xs">PNG, JPG, GIF up to 10MB</p>
+                <p className="text-xs text-muted-foreground">JPG, PNG do 10MB</p>
               </div>
             </div>
           </div>
+
+          <Separator />
+          
+          {/* Sekcja Opis (OPCJONALNA) */}
           <div className="space-y-2">
-            <Label htmlFor="description">Opis</Label>
+            <Label htmlFor="description" className="font-semibold text-base flex items-center justify-between">
+              <span>Opis</span>
+              <span className="text-xs text-primary flex items-center">
+                  <Zap className="h-3 w-3 mr-1" /> AI może wypełnić to za Ciebie!
+              </span>
+            </Label>
             <Textarea
               id="description"
               name="description"
               value={formData.description}
               onChange={handleInputChange}
-              placeholder="Any additional details about the waste"
+              placeholder="Np. 'Stary telewizor, działa, ale ma pęknięty ekran'. Pomoże nam to lepiej go sklasyfikować."
+              rows={3}
             />
           </div>
+
+          <Separator />
+
+          {/* Sekcja Kategoria Śmieci (OPCJONALNA, mniejsze przyciski) */}
           <div className="space-y-4">
-            <Label>Kategoria Śmieci</Label>
-            <div className="grid grid-cols-2 gap-4">
+            <Label className="font-semibold text-base flex items-center justify-between">
+              <span>Wybierz Kategorię Odpadu</span>
+              <span className="text-xs text-primary flex items-center">
+                  <Zap className="h-3 w-3 mr-1" /> AI może rozpoznać to ze zdjęcia!
+              </span>
+            </Label>
+            
+            {/* Zmiana z grid-cols-2 na grid-cols-4 na dużych ekranach i mniejszy padding */}
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {WASTE_CATEGORIES.map((category) => (
                 <Label
                   key={category.id}
                   htmlFor={`category-${category.id}`}
                   className={`
-                    flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-all
+                    flex flex-col items-center justify-center space-y-1 p-3 border rounded-lg cursor-pointer transition-all h-24
                     ${
                       selectedCategory === category.id
-                        ? "border-primary ring-2 ring-primary/50"
-                        : "border-gray-200 hover:border-gray-300"
+                        ? "border-primary ring-2 ring-primary/50 bg-primary/10"
+                        : "border-gray-200 hover:border-gray-300 hover:bg-gray-50"
                     }
                   `}
                 >
@@ -228,39 +273,46 @@ export function WasteJobForm() {
                     value={category.id}
                     checked={selectedCategory === category.id}
                     onChange={handleCategoryChange}
-                    className="sr-only" // Ukrywa domywny radio button
-                    required
+                    className="sr-only"
+                    // Usunięto 'required'
                   />
-                  <div className="flex-shrink-0">
-                    <CategoryIcon category={category.iconKey} className="!w-8 !h-8" />
-                  </div>
-                  <div className="flex-grow">
-                    <span className="font-semibold text-sm block">
-                      {category.name}
-                    </span>
-                    {category.description && (
-                      <span className="text-xs text-muted-foreground block">
-                        {category.description}
-                      </span>
-                    )}
-                  </div>
-                  {/* Własny znacznik wyboru */}
-                  <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
-                    {selectedCategory === category.id && (
-                      <div className="w-2 h-2 rounded-full bg-primary" />
-                    )}
-                  </div>
+                  <CategoryIcon category={category.iconKey} className="!w-6 !h-6" />
+                  <span className="font-medium text-xs text-center block">
+                    {category.name}
+                  </span>
                 </Label>
               ))}
             </div>
+            
+            {/* Opcjonalne: przycisk resetujący wybór kategorii */}
+            {selectedCategory && (
+                <div className="text-right">
+                    <Button 
+                        type="button" 
+                        variant="ghost" 
+                        onClick={() => setSelectedCategory(null)}
+                        className="text-xs text-muted-foreground hover:text-primary h-auto p-0"
+                    >
+                        Anuluj wybór kategorii
+                    </Button>
+                </div>
+            )}
           </div>
           
+          {/* Komunikaty o błędach i sukcesie */}
           {error && <p className="text-sm text-destructive">{error}</p>}
           {success && <p className="text-sm text-green-600">{success}</p>}
         </CardContent>
         <CardFooter className="mt-6">
-          <Button type="submit" disabled={isLoading} className="w-full">
-            {isLoading ? "Submitting..." : "Znajdź gdzie wyrzucić przedmiot"}
+          <Button type="submit" disabled={isLoading} className="w-full text-lg h-12">
+            {isLoading ? (
+                <>
+                    <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                    Przesyłanie...
+                </>
+            ) : (
+                "Znajdź gdzie wyrzucić przedmiot"
+            )}
           </Button>
         </CardFooter>
       </form>

@@ -1,6 +1,5 @@
 import { UserButton } from "@clerk/nextjs";
 import { NavigationMenu, NavigationMenuItem, NavigationMenuLink, NavigationMenuList } from "./ui/navigation-menu";
-import { auth } from "@clerk/nextjs/server";
 import AppLogo from "./app-logo";
 
 export function NavigationMenuBar() {
