@@ -12,6 +12,7 @@ import { MapPin, Calendar, Package2 } from "lucide-react";
 import { wasteCategory, wasteJobStatus } from "@/src/db/schema";
 import { VariantProps, cva } from "class-variance-authority";
 import { cn, getBase64Image } from "@/src/lib/utils";
+import CategoryIcon from "./category-icon";
 
 export type WasteJob = {
   id: number;
@@ -61,13 +62,13 @@ const categoryDetails: Record<
   { name: string; icon: React.ReactNode }
 > = {
   pszok: { name: "PSZOK", icon: <Package2 className="h-8 w-8" /> },
-  electronics: { name: "Electronics", icon: <Package2 className="h-8 w-8" /> },
+  electronics: { name: "Elektronika", icon: <Package2 className="h-8 w-8" /> },
   expired_medications: {
-    name: "Medications",
+    name: "leki",
     icon: <Package2 className="h-8 w-8" />,
   },
   small_electronics: {  
-    name: "Small Electronics",
+    name: "Mała elektronika",
     icon: <Package2 className="h-8 w-8" />,
   },
 };
@@ -99,7 +100,7 @@ export function WasteJobCard({ wasteJob }: WasteJobCardProps) {
           <div className="grow space-y-3">
             <div className="flex items-center gap-3">
               <div className="shrink-0 bg-purple-100 text-purple-600 p-2 rounded-full">
-                {categoryInfo.icon}
+                <CategoryIcon category={category}/>
               </div>
               <div>
                 <CardTitle className="text-lg font-bold leading-tight">{title}</CardTitle>
