@@ -5,7 +5,7 @@ import { WasteJobList } from "./components/waste-job-list";
 export default function Home() {
 
   return <div>
-    <WasteJobForm/>
-    <WasteJobList/>
+    <WasteJobForm />
+    <WasteJobList />
   </div>;
 }

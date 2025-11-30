@@ -36,15 +36,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <ClerkProvider appearance={clerkAppearanceObject}>
         <body className={`min-h-screen flex flex-col antialiased`}>
           <div className="sticky top-0 z-50 w-full flex items-center py-1 border-b min-h-[60px] px-8 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
             {/* Left spacer */}
             <div className="w-16"></div>
 
-            <NavigationMenuBar/>
-          
+            <NavigationMenuBar />
+
             {/* Right side - Profile Menu */}
             {/* <ProfileMenu /> */}
           </div>

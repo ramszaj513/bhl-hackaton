@@ -5,7 +5,7 @@ import proj4 from "proj4";
 
 // Define the projection for EPSG:2178 (Warsaw area)
 // Source: https://epsg.io/2178
-const EPSG_2178 = "+proj=tmerc +lat_0=0 +lon_0=19 +k=0.9993 +x_0=500000 +y_0=-5300000 +ellps=GRS80 +units=m +no_defs";
+const EPSG_2178 = "+proj=tmerc +lat_0=0 +lon_0=21 +k=0.999923 +x_0=7500000 +y_0=0 +ellps=GRS80 +units=m +no_defs +type=crs";
 const WGS84 = "EPSG:4326";
 
 const BASE_URL = "https://testmapa.um.warszawa.pl/mapviewer/dataserver/DANE_WAWA";
