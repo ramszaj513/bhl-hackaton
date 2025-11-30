@@ -7,6 +7,8 @@ import { WasteDeliveryPointType } from '@/src/db/schema';
 import WastePointMarker from './waste-point-marker';
 import RouteLayer from './mapbox/route-layer';
 import { Feature, LineString } from 'geojson';
+import { WasteJob } from './waste-job-card';
+import WasteJobMarker from './waste-job-marker';
 
 
 const MOCK_START_POINT = {
@@ -15,8 +17,9 @@ const MOCK_START_POINT = {
 };
 
 
-export default function MapComponent({ points, startingPoint = MOCK_START_POINT, targetCategory }: {
-    points: WasteDeliveryPointType[];
+export default function MapComponent({ deliveryPoints, pickupPoints, startingPoint = MOCK_START_POINT, targetCategory }: {
+    deliveryPoints: WasteDeliveryPointType[];
+    pickupPoints: WasteJob[];
     targetCategory?: WasteDeliveryPointType['category'];
     startingPoint?: { longitude: number; latitude: number };
 }) {
@@ -29,7 +32,7 @@ export default function MapComponent({ points, startingPoint = MOCK_START_POINT,
             return;
         }
 
-        const categoryPoints = points.filter(p => p.category === targetCategory);
+        const categoryPoints = deliveryPoints.filter(p => p.category === targetCategory);
         if (categoryPoints.length === 0) {
             setRouteGeoJSON(null);
             return;
@@ -75,7 +78,7 @@ export default function MapComponent({ points, startingPoint = MOCK_START_POINT,
 
         fetchRoute();
 
-    }, [targetCategory, points]);
+    }, [targetCategory, deliveryPoints]);
 
     return (
         <div className="w-full h-full min-h-[500px] rounded-lg overflow-hidden relative">
@@ -88,8 +91,11 @@ export default function MapComponent({ points, startingPoint = MOCK_START_POINT,
                     zoom: 13
                 }}
             >
-                {points.map(point => (
+                {deliveryPoints.map(point => (
                     <WastePointMarker key={point.id} point={point} />
+                ))}
+                {pickupPoints.map(point => (
+                    <WasteJobMarker key={point.id} point={point} />
                 ))}
                 <RouteLayer routeGeoJSON={routeGeoJSON} />
             </MapProvider>
