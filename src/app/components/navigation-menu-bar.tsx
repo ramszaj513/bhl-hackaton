@@ -4,7 +4,7 @@ import AppLogo from "./app-logo";
 
 export function NavigationMenuBar() {
   return (
-    <div className="flex-1 flex justify-between items-center gap-4">
+    <div className="flex-1 flex justify-between items-center gap-4 z-[300]">
       <AppLogo />
       <NavigationMenu>
         <NavigationMenuList>
