@@ -12,6 +12,14 @@ import {
 } from "./ui";
 import { LocationPicker } from "./location-picker";
 import { MapPin, Users } from "lucide-react";
+import CategoryIcon from "./category-icon";
+
+const CATEGORY_NAMES: Record<string, string> = {
+  pszok: "Gabaryty/PSZOK",
+  small_electronics: "Mała Elektronika",
+  electronics: "Duża Elektronika",
+  expired_medications: "Lekarstwa i odpady medyczne",
+};
 
 interface WasteJobFindProps {
   onComplete?: () => void;
@@ -115,9 +123,17 @@ export function WasteJobFind({ onComplete, jobId }: WasteJobFindProps) {
         <CardTitle>Co chcesz zrobić z odpadem?</CardTitle>
         <CardDescription>
           {wasteJobCategory && (
-            <span className="block mb-2 font-medium text-primary">
-              Kategoria: {wasteJobCategory}
-            </span>
+            <div className="flex items-center gap-2 mb-4 p-3 bg-primary/5 rounded-lg border border-primary/10">
+              <CategoryIcon category={wasteJobCategory} className="w-8 h-8" />
+              <div>
+                <div className="text-xs text-muted-foreground font-medium uppercase tracking-wider">
+                  Zidentyfikowana kategoria
+                </div>
+                <div className="font-semibold text-primary text-lg">
+                  {CATEGORY_NAMES[wasteJobCategory] || wasteJobCategory}
+                </div>
+              </div>
+            </div>
           )}
           Wybierz jedną z opcji, aby kontynuować
         </CardDescription>
