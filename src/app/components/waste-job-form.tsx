@@ -15,10 +15,10 @@ import {
   CardTitle,
 } from "./ui";
 import { convertFileToBase64 } from "@/src/lib/utils";
+import CategoryIcon from "./category-icon";
 
 export function WasteJobForm() {
   const [formData, setFormData] = useState<Partial<CreateWastejobDto>>({
-    title: "",
     description: "",
   });
   const [file, setFile] = useState<File | null>(null);
@@ -26,6 +26,7 @@ export function WasteJobForm() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState<"pszok" | "small_electronics" | "electronics" | "expired_medications" | null>(null);
 
   const handleInputChange = (
     e: ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -46,14 +47,48 @@ export function WasteJobForm() {
     }
   };
 
+  interface WasteCategory {
+    id: string; 
+    name: string;
+    description?: string; 
+    iconKey: string; 
+  }
+
+  const WASTE_CATEGORIES: WasteCategory[] = [
+  {
+    id: "pszok",
+    name: "PSZOK",
+    description: "Odpady wielkogabarytowe, budowlane lub inne problematyczne",
+    iconKey: "pszok",
+  },
+  {
+    id: "small_electronics",
+    name: "Mała Elektronika",
+    description: "Np. telefony, ładowarki, małe AGD.",
+    iconKey: "small_electronics",
+  },
+  {
+    id: "electronics",
+    name: "Duża Elektronika",
+    description: "Np. telewizory, monitory, pralki, lodówki.",
+    iconKey: "electronics",
+  },
+  {
+    id: "expired_medications",
+    name: "Lekarstwa i Odpady Medyczne",
+    description: "Przeterminowane leki i inne odpady farmaceutyczne.",
+    iconKey: "expired_medications",
+  },
+];
+
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
     setError(null);
     setSuccess(null);
 
-    if (!file || !formData.title) {
-      setError("Title and a picture are required.");
+    if (!file) {
+      setError("Picture is required.");
       setIsLoading(false);
       return;
     }
@@ -66,12 +101,13 @@ export function WasteJobForm() {
       const pickupLongitude = "21.0122";
 
       const data: CreateWastejobDto = {
-        title: formData.title,
         description: formData.description,
         imageData: imageData,
         pickupLatitude,
         pickupLongitude,
       };
+
+      if(selectedCategory) { data.category = selectedCategory };
 
       const response = await fetch("/api/wastejobs", {
         method: "POST",
@@ -95,6 +131,11 @@ export function WasteJobForm() {
     } finally {
       setIsLoading(false);
     }
+  };
+
+  const handleCategoryChange = (e: ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value as "pszok" | "small_electronics" | "electronics" | "expired_medications";
+    setSelectedCategory(value);
   };
 
   return (
@@ -155,7 +196,7 @@ export function WasteJobForm() {
             </div>
           </div>
           <div className="space-y-2">
-            <Label htmlFor="description">Description</Label>
+            <Label htmlFor="description">Opis</Label>
             <Textarea
               id="description"
               name="description"
@@ -164,15 +205,54 @@ export function WasteJobForm() {
               placeholder="Any additional details about the waste"
             />
           </div>
-          <div className="space-y-2">
-            <Label htmlFor="description">Trash Category</Label>
-            <Textarea
-              id="description"
-              name="description"
-              value={formData.category}
-              onChange={handleInputChange}
-              placeholder="Any additional details about the waste"
-            />
+          <div className="space-y-4">
+            <Label>Kategoria Śmieci</Label>
+            <div className="grid grid-cols-2 gap-4">
+              {WASTE_CATEGORIES.map((category) => (
+                <Label
+                  key={category.id}
+                  htmlFor={`category-${category.id}`}
+                  className={`
+                    flex items-center space-x-3 p-4 border rounded-lg cursor-pointer transition-all
+                    ${
+                      selectedCategory === category.id
+                        ? "border-primary ring-2 ring-primary/50"
+                        : "border-gray-200 hover:border-gray-300"
+                    }
+                  `}
+                >
+                  <Input
+                    type="radio"
+                    id={`category-${category.id}`}
+                    name="category"
+                    value={category.id}
+                    checked={selectedCategory === category.id}
+                    onChange={handleCategoryChange}
+                    className="sr-only" // Ukrywa domywny radio button
+                    required
+                  />
+                  <div className="flex-shrink-0">
+                    <CategoryIcon category={category.iconKey} className="!w-8 !h-8" />
+                  </div>
+                  <div className="flex-grow">
+                    <span className="font-semibold text-sm block">
+                      {category.name}
+                    </span>
+                    {category.description && (
+                      <span className="text-xs text-muted-foreground block">
+                        {category.description}
+                      </span>
+                    )}
+                  </div>
+                  {/* Własny znacznik wyboru */}
+                  <div className="w-4 h-4 rounded-full border border-gray-300 flex items-center justify-center">
+                    {selectedCategory === category.id && (
+                      <div className="w-2 h-2 rounded-full bg-primary" />
+                    )}
+                  </div>
+                </Label>
+              ))}
+            </div>
           </div>
           
           {error && <p className="text-sm text-destructive">{error}</p>}
