@@ -1,4 +1,4 @@
-import { auth } from "@clerk/nextjs/server";
+import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { getWastejobs, createWastejob } from "@/src/lib/waste-jobs";
 import { CreateWastejobDto } from "@/src/lib/types/create-wastejob.dto";
@@ -20,19 +20,19 @@ export async function GET() {
 
 export async function POST(request: Request) {
   try {
-    await auth.protect();
+    const { userId } = await auth.protect();
     
     const body: CreateWastejobDto = await request.json();
     
     // Validate required fields
-    if (!body.title || !body.initialPhotoUrl || !body.pickupLatitude || !body.pickupLongitude) {
+    if (!body.imageData || !body.pickupLatitude || !body.pickupLongitude) {
       return NextResponse.json(
-        { error: "Missing required fields: title, initialPhotoUrl, pickupLatitude, pickupLongitude" },
+        { error: "Missing required fields: imageData, pickupLatitude, pickupLongitude" },
         { status: 400 }
       );
     }
     
-    const newWastejob = await createWastejob(body);
+    const newWastejob = await createWastejob(userId, body);
     return NextResponse.json(newWastejob, { status: 201 });
   } catch (error) {
     console.error("Error in POST /api/wastejobs:", error);

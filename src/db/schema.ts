@@ -1,17 +1,13 @@
-import { relations, sql } from "drizzle-orm";
 import {
   decimal,
-  foreignKey,
-  index,
-  integer,
   numeric,
   json,
   pgEnum,
   pgTable,
   serial,
   text,
-  timestamp,
   varchar,
+  timestamp,
 } from "drizzle-orm/pg-core";
 
 export const wasteCategory = pgEnum("waste_category", [
@@ -40,19 +36,25 @@ export const WasteDeliveryPoint = pgTable("waste_delivery_point", {
   category: wasteCategory("category").notNull(),
 });
 
+export const wasteJobStatus = pgEnum("waste_job_status", [
+  "draft",
+  "active",
+  "claimed",
+  "completed",
+])
+
 export const wastejob = pgTable('wastejob', {
   id: serial('id').primaryKey(),
-  // clientId: integer('client_id').notNull().references(() => users.id), // Zleceniodawca (kto prosi)
-  // runnerId: integer('runner_id').references(() => users.id), // Zleceniobiorca (kto się podjął)
-  // categoryId: integer('category_id').notNull().references(() => wasteCategories.id), // Kategoria śmieci (z rozpoznawania AI)
-  // targetPointId: integer('target_point_id').references(() => disposalPoints.id), // Docelowy punkt odbioru (znaleziony przez appkę)
-
+  createdById: text('created_by_id').notNull(),
+  claimedById: text('claimed_by_id'), 
+  status: wasteJobStatus('status').notNull(),
+  createdAt: timestamp('created_at').notNull().defaultNow(),
 
   // DANE ZLECENIA
   title: varchar('title', { length: 256 }).notNull(),
   description: text('description'),
-  initialPhotoUrl: varchar('initial_photo_url', { length: 512 }).notNull(), // Zdjęcie śmieci od klienta
-
+  imageData: text('imageData').notNull(),
+  category: wasteCategory('category').notNull(),
 
   // LOKALIZACJA ODBIORU (skąd odebrać śmieci)
   pickupLatitude: numeric('pickup_latitude', { precision: 10, scale: 7 }).notNull(),

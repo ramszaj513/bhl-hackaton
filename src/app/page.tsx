@@ -1,10 +1,11 @@
-import NavigationMenuBar from "./components/navigation-menu-bar";
-import { Button } from "./components/ui/button";
-import { getCategoryBasedOnDescription } from "@/src/lib/recognition"
+import { WasteJobForm } from "./components/waste-job-form";
+import { WasteJobList } from "./components/waste-job-list";
 
-getCategoryBasedOnDescription()
 
 export default function Home() {
+
   return <div>
+    <WasteJobForm/>
+    <WasteJobList/>
   </div>;
 }

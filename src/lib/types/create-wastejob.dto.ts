@@ -1,7 +1,8 @@
 export type CreateWastejobDto = {
-  title: string;
+  title?: string;
   description?: string;
-  initialPhotoUrl: string;
+  category?: "pszok" | "small_electronics" | "electronics" | "expired_medications",
+  imageData: string;
   pickupLatitude: string;
   pickupLongitude: string;
 };
