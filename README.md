@@ -2,6 +2,11 @@
 
 WyrzućZaMnie is a modern web application designed to revolutionize how communities handle special waste disposal. By leveraging Artificial Intelligence and a peer-to-peer model, it connects residents with proper waste collection points and neighbors willing to help with transport.
 
+## Preview
+
+![alt text](image.png)
+
+
 ## Features
 
 ### AI-Powered Waste Recognition
@@ -33,7 +38,8 @@ WyrzućZaMnie is a modern web application designed to revolutionize how communit
 -   **AI Model**: [Google Gemini 2.0 Flash](https://deepmind.google/technologies/gemini/) (via Google Gen AI SDK)
 -   **Geocoding**: [Geoapify](https://www.geoapify.com/)
 
-## 📦 Getting Started
+
+## Getting Started
 
 1.  **Clone the repository**
     ```bash
