@@ -65,7 +65,7 @@ export default function ZleceniaContent({
             {/* 3. Kontener Formularza */}
             {/* Używamy flex, aby formularz był z lewej, a 3/4 ekranu (mapa) z prawej */}
 
-            <div className="absolute top-5 left-5 h-[calc(100vh-100px)] z-[200]">
+            <div className="absolute top-5 left-5 h-[calc(100vh-100px)] z-40">
                 <WasteJobList onShowRoute={handleShowRoute} />
             </div>
         </div>

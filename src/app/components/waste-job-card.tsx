@@ -5,10 +5,10 @@ import {
   CardHeader,
   CardTitle,
   Badge,
-  Button, // Dodano Button
-  CardFooter, // Dodano CardFooter
+  Button,
+  CardFooter,
 } from "./ui";
-import { MapPin, Calendar, Package2, Clock, CheckCircle } from "lucide-react"; // Dodano Clock i CheckCircle
+import { MapPin, Calendar, Package2, Clock, CheckCircle } from "lucide-react";
 import { wasteCategory, wasteJobStatus } from "@/src/db/schema";
 import { VariantProps, cva } from "class-variance-authority";
 import { cn, getBase64Image } from "@/src/lib/utils";
@@ -29,18 +29,17 @@ export type WasteJob = {
 };
 
 // ----------------------------------------------------
-// 1. Zaktualizowane warianty statusu i tłumaczenia
+// Variants and Translations
 // ----------------------------------------------------
 
-// Warianty dla statusu (kolory)
 const badgeVariants = cva(
-  "absolute top-4 right-4 text-xs font-semibold px-3 py-1 rounded-full shadow-md",
+  "text-xs font-semibold px-3 py-1 rounded-full shadow-md", // Removed absolute positioning here, handled in layout
   {
     variants: {
       variant: {
         draft: "bg-gray-500 text-white",
         active: "bg-green-600 text-white",
-        claimed: "bg-yellow-400 text-gray-800", // Zmieniony kolor, aby pasował do "In Progress"
+        claimed: "bg-yellow-400 text-gray-800",
         completed: "bg-blue-600 text-white",
       },
     },
@@ -52,15 +51,14 @@ const badgeVariants = cva(
 
 interface WasteJobCardProps extends VariantProps<typeof badgeVariants> {
   wasteJob: WasteJob;
-  onClaimJob: (jobId: number) => void; // Dodana prop do obsługi akcji
-  isButtonDisabled?: boolean; // Prop do ewentualnego wyłączania przycisku
+  onClaimJob: (jobId: number) => void;
+  isButtonDisabled?: boolean;
   onShowRoute?: (
     location: { latitude: number; longitude: number },
     category: string
   ) => void;
 }
 
-// Mapowanie statusów na POLSKI tekst
 const statusTranslations: Record<WasteJob["status"], string> = {
   draft: "Szkic",
   active: "Aktywne",
@@ -68,7 +66,6 @@ const statusTranslations: Record<WasteJob["status"], string> = {
   completed: "Zakończone",
 };
 
-// Mapowanie kategorii na POLSKIE nazwy i ikonę (używamy CategoryIcon, ale nazwy też się przydadzą)
 const categoryTranslations: Record<
   WasteJob["category"],
   { name: string; color: string }
@@ -114,96 +111,124 @@ export function WasteJobCard({
 
   const isClaimable = status === "active";
 
-  // ----------------------------------------------------
-  // 2. Ulepszony wygląd komponentu
-  // ----------------------------------------------------
-
   return (
-    <Card className="w-full max-w-2xl mx-auto border-2 border-gray-100 shadow-md hover:shadow-xl transition-all duration-300 relative">
-
-      {/* Badge Statusu - na górze po prawej */}
-      <Badge className={cn(badgeVariants({ variant: status }), "z-10")}>
-        {status === "claimed" ? <Clock className="h-3 w-3 mr-1" /> : <CheckCircle className="h-3 w-3 mr-1" />}
-        {statusTranslations[status]}
-      </Badge>
-
-      <div className="flex flex-col md:flex-row">
-
-        {/* Lewa Strona - Zdjęcie */}
-        <div className="md:w-1/3 shrink-0 p-4 border-r border-gray-100">
+    <Card className="group w-full h-50 mx-auto overflow-hidden border-0 shadow-lg hover:shadow-xl transition-all duration-300 bg-white/80 backdrop-blur-sm">
+      {/* Changed layout to strictly 'flex-row' (horizontal) 
+         and 'h-full' to ensure internal divs stretch 
+      */}
+      <div className="flex flex-row h-full">
+        
+        {/* Image Section: 
+           - w-1/3: Strictly one third of width
+           - h-full: Covers full height
+        */}
+        <div className="relative w-1/3 h-full shrink-0 overflow-hidden">
           <img
             src={getBase64Image(imageData)}
             alt={title}
-            className="w-full h-full md:h-40 object-cover rounded-lg shadow-inner border border-gray-200"
+            className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
           />
+          {/* Optional: Dark overlay for better contrast if you add text over image */}
+          <div className="absolute inset-0 bg-linear-to-t from-black/10 to-transparent pointer-events-none" />
         </div>
 
-        {/* Prawa Strona - Treść */}
-        <div className="md:w-2/3 grow">
-          <CardHeader className="p-4 pb-2">
-            <div className="flex items-center gap-3">
-              <div className={cn("shrink-0 p-2 rounded-full", categoryInfo.color === "text-purple-600" ? "bg-purple-100" : categoryInfo.color === "text-red-600" ? "bg-red-100" : categoryInfo.color === "text-blue-600" ? "bg-blue-100" : "bg-amber-100")}>
-                <CategoryIcon category={category} className={cn("!w-6 !h-6", categoryInfo.color)} />
+        {/* Content Section:
+           - w-2/3: Takes remaining width
+        */}
+        <div className="flex flex-col w-2/3 p-5">
+          <div className="flex justify-between items-start mb-2">
+            <div className="space-y-1 overflow-hidden">
+              <div className="flex items-center gap-2 flex-wrap">
+                <Badge
+                  variant="outline"
+                  className={cn(
+                    "px-2 py-0.5 text-xs font-medium border-0 bg-opacity-10 whitespace-nowrap",
+                    categoryInfo.color === "text-purple-600"
+                      ? "bg-purple-100 text-purple-700"
+                      : categoryInfo.color === "text-red-600"
+                      ? "bg-red-100 text-red-700"
+                      : categoryInfo.color === "text-blue-600"
+                      ? "bg-blue-100 text-blue-700"
+                      : "bg-amber-100 text-amber-700"
+                  )}
+                >
+                  {categoryInfo.name}
+                </Badge>
+                <span className="text-xs text-muted-foreground flex items-center whitespace-nowrap">
+                  <Calendar className="w-3 h-3 mr-1" />
+                  {formattedDate}
+                </span>
               </div>
-              <div>
-                <CardTitle className="text-xl font-extrabold leading-snug">{title}</CardTitle>
-                <p className="text-sm text-muted-foreground font-medium mt-0.5">{categoryInfo.name}</p>
-              </div>
+              <h3 className="text-xl font-bold text-gray-900 leading-tight truncate group-hover:text-primary transition-colors">
+                {title}
+              </h3>
             </div>
-          </CardHeader>
 
-          <CardContent className="flex flex-col px-4 justify-between">
+            {/* Status Badge - Always visible in top right corner of content */}
+            <div className="shrink-0 ml-2">
+              <Badge className={cn(badgeVariants({ variant: status }))}>
+                {statusTranslations[status]}
+              </Badge>
+            </div>
+          </div>
 
-            {/* Opis */}
-            {description && (
-              <CardDescription className="text-gray-700 text-sm italic line-clamp-2">
-                "{description}"
-              </CardDescription>
-            )}
+          {/* Description with line clamping to respect fixed height */}
+          {description && (
+            <p className="text-sm text-gray-600 line-clamp-3 mb-4 grow">
+              {description}
+            </p>
+          )}
 
-            {/* Metadane */}
-            <div className="flex flex-wrap justify-between items-center gap-x-6 gap-y-2 text-gray-500 text-xs pt-1 border-t pt-2 mt-2">
-              {distance && (
-                <div className="flex items-center font-medium">
-                  <MapPin className="h-3.5 w-3.5 mr-1.5 text-red-500" />
-                  <span>{distance.toFixed(1)} km stąd</span>
+          {/* Footer actions */}
+          <div className="mt-auto pt-3 border-t border-gray-100 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
+            <div className="flex flex-col gap-1 text-sm text-gray-500 min-w-0">
+              {distance !== undefined && (
+                <div className="flex items-center text-gray-700 font-medium whitespace-nowrap">
+                  <MapPin className="w-4 h-4 mr-1.5 text-primary shrink-0" />
+                  {distance.toFixed(1)} km stąd
                 </div>
               )}
-              <div className="flex items-center font-medium">
-                <Calendar className="h-3.5 w-3.5 mr-1.5 text-primary" />
-                <span>Utworzono: {formattedDate}</span>
-              </div>
               {address && (
-                <span className="truncate max-w-[200px] text-gray-600">
-                  <MapPin className="h-3.5 w-3.5 mr-1.5 inline-block" />
+                <div className="text-xs text-gray-400 truncate max-w-[180px]">
                   {address}
-                </span>
+                </div>
               )}
             </div>
-          </CardContent>
 
-          <CardFooter className="p-4 pt-0 flex justify-end gap-2">
-            {onShowRoute && (
-              <Button
-                variant="outline"
-                size="sm"
-                onClick={() =>
-                  onShowRoute(
-                    {
-                      latitude: parseFloat(wasteJob.pickupLatitude),
-                      longitude: parseFloat(wasteJob.pickupLongitude),
-                    },
-                    wasteJob.category
-                  )
-                }
-              >
-                <MapPin className="h-4 w-4 mr-2" />
-                Pokaż trasę
-              </Button>
-            )}
-            {/* Tutaj można dodać inne przyciski, np. "Odbierz" */}
-          </CardFooter>
+            <div className="flex gap-2 w-full sm:w-auto shrink-0">
+              {onShowRoute && (
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="flex-1 sm:flex-none px-3"
+                  onClick={() =>
+                    onShowRoute(
+                      {
+                        latitude: parseFloat(wasteJob.pickupLatitude),
+                        longitude: parseFloat(wasteJob.pickupLongitude),
+                      },
+                      wasteJob.category
+                    )
+                  }
+                >
+                  <MapPin className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Trasa</span>
+                </Button>
+              )}
 
+              {isClaimable && (
+                <Button
+                  size="sm"
+                  className="flex-1 sm:flex-none bg-primary hover:bg-primary/90 px-3"
+                  onClick={() => onClaimJob(id)}
+                  disabled={isButtonDisabled}
+                >
+                  <Package2 className="w-4 h-4 sm:mr-2" />
+                  <span className="hidden sm:inline">Odbierz</span>
+                </Button>
+              )}
+            </div>
+          </div>
         </div>
       </div>
     </Card>
